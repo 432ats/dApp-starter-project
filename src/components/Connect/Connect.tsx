@@ -2,9 +2,6 @@ import React, { useState } from 'react'
 
 
 
-interface Window {
-    ethereum: any
-}
 
 function Connect() {
     /* ユーザーのパブリックウォレットを保存するために使用する状態変数を定義します */
