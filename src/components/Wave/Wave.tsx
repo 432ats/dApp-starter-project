@@ -131,7 +131,7 @@ function Wave() {
         {/* メッセージボックスを実装*/} 
         <textarea
             name="messageArea"
-            placeholder="メッセージはこちら"
+            placeholder="into text"
             //type="text"
             id="message"
             value={messageValue}
