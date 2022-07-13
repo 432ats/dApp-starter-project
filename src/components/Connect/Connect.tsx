@@ -37,8 +37,8 @@ function Connect() {
             <button className="connectButton" onClick={connectWallet}>
                 Connect Wallet
             </button>
-            )}
-            {currentAccount && (
+        )}
+        {currentAccount && (
             <button className="connectButton" onClick={connectWallet}>
                 Wallet Connected
             </button>

@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react'
 import abi from '../../utils/WavePortal.json'
 
 function Wave() {
+    /* ユーザーのメッセージを保存するために使用する状態変数を定義 */
+    const [messageValue, setMessageValue] = useState("");
      /**
      * デプロイされたコントラクトのアドレスを保持する変数を作成
      */
-    const contractAddress = "0xf955Cd1ddbA49Aa29D5f52c916A19094d628a5D5";
+    const contractAddress = "0x64bdb643cD342F1E3633ecA3B0e620c74E6d9044";
     /**
      * ABIの内容を参照する変数を作成
      */
@@ -54,18 +56,20 @@ function Wave() {
         let wavePortalContract: any;
         const onNewWave = (from: string, timestamp: number, message: string) => {
             console.log("NewWave", from, timestamp, message);
-            setAllWaves((prevState) => [
-                ...prevState,
-                {
-                    address: from,
-                    timestamp: new Date(timestamp * 1000),
-                    message: message,
-                },
-            ]);
+            setAllWaves((prevState): any => [
+                    ...prevState,
+                    {
+                        address: from,
+                        timestamp: new Date(timestamp * 1000),
+                        message: message,
+                    },
+                ]
+            );
         };
         /* NewWaveイベントがコントラクトから発信されたときに、情報を受け取ります */
-        if (window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const { ethereum }:any = window;
+        if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
             const signer = provider.getSigner();
             wavePortalContract = new ethers.Contract(
                 contractAddress,
@@ -98,7 +102,16 @@ function Wave() {
                 );
                 let count = await wavePortalContract.getTotalWaves();
                 console.log("Retrieved total wave count...", count.toNumber());
-                console.log("Signer:", signer);
+                /* コントラクトに👋（wave）を書き込む */
+                const waveTxn = await wavePortalContract.wave(messageValue, {
+                    gasLimit: 300000,
+                });
+                console.log("Mining...", waveTxn.hash);
+                await waveTxn.wait();
+                console.log("Mined -- ", waveTxn.hash);
+                count = await wavePortalContract.getTotalWaves();
+                console.log("Retrieved total wave count...", count.toNumber());
+                // console.log("Signer:", signer);
             } else {
                 console.log("Ethereum object doesn't exist!");
             }
@@ -110,9 +123,20 @@ function Wave() {
     return (
         <>
         <div>Wave</div>
+        {/* waveボタンにwave関数を連動 */}
         <button className="waveButton" onClick={wave}>
             Wave at Me
         </button>
+
+        {/* メッセージボックスを実装*/} 
+        <textarea
+            name="messageArea"
+            placeholder="メッセージはこちら"
+            //type="text"
+            id="message"
+            value={messageValue}
+            onChange={(e) => setMessageValue(e.target.value)}
+        />
         </>
     )
 }
